@@ -1,0 +1,35 @@
+name: Endor Labs Scan
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: "Repository to scan (format: owner/repo)"
+        required: true
+        type: string
+      namespace:
+        description: "Endor Labs namespace"
+        required: true
+        type: string
+
+jobs:
+  scan-repository:
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.inputs.repository }}
+          
+      - name: Scan with Endor Labs
+        uses: endorlabs/github-action@main
+        with:
+          namespace: "${{ github.event.inputs.namespace }}"
+          scan_summary_output_type: "table"
+          pr: "false"
+          scan_git_logs: "true"
+          scan_dependencies: "true"
+          scan_secrets: "true"
+          additional_args: "--install-build-tools --enable-build-tools-version-detection --github"
+          api: "https://api.endorlabs.com" 
